@@ -13,7 +13,7 @@ def extract_info_from_text(text):
     prompt = f"""
     Extract the following information from the provided text:
 
-    1. Executive Directors (title, name, total remuneration (salary, bonuses, others if available), and age).
+    1. Executive Directors (title, name, age and total remuneration (salary, bonuses, others if available).
     2. Geographical segments (total revenue and percentage).
     3. Business segments (total revenue and percentage).
     4. Major customers (total revenue and percentage).
