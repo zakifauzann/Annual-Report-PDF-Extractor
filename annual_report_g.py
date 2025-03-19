@@ -83,8 +83,13 @@ def analyze_text_with_gemini(text):
 
     try:
         model = genai.GenerativeModel("gemini-2.0-flash")
-        response = model.generate_content(prompt + "\n\n" + text)
-        print( response.usage_metadata)  # Get usage metadata
+     
+        generation_config = genai.GenerationConfig(
+                            temperature=0.5,
+                        )
+
+        response = model.generate_content(prompt + "\n\n" + text, generation_config=generation_config)  # Added temperature parameter
+        print(response.usage_metadata)  # Get usage metadata
 
         # Extract JSON using regex to handle extra text
         match = re.search(r"\{.*}", response.text, re.DOTALL)
