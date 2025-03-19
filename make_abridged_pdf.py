@@ -56,6 +56,7 @@ def extract_titles_from_pdf(pdf_path):
             potential_title = potential_title.strip() #Remove extra space
             titles.append(potential_title)
 
+        doc.close()
         return titles
 
     except FileNotFoundError:
