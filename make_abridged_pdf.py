@@ -1,6 +1,7 @@
 import fitz  # pymupdf is imported as fitz
+import os
 
-possible_keywords = ["management" , "executive", "director" ,"senior management", "corporate structure", "corporate"
+possible_keywords = ["management" , "executive", "director" ,"senior management", "corporate structure", "corporate", "corporate profile"
                     "chairman statement", "chairman", "discussion and analysis", "discussion", "analysis",
                     "financial statements" , "notes to financial statements", "notes to the financial statements",
                     "corporate info" , "vision and mission", "vision" , "mission" , 
@@ -78,19 +79,28 @@ def split_into_sections(page_titles):
                 next_page_flag = True  ## possible next page is useful
                 count = 0 ## reset next page counter
                 list_of_pages.append(page_num)
+                continue
 
             if title == "":
                 if next_page_flag and count < 3:
                     print("Match:" , page_num , " -   ", title) # debug
                     list_of_pages.append(page_num)
                     count =  count + 1
+                    continue
                 else:
+                    print("No Match : " , page_num , " - ", title) # debug
                     count = 0
                     next_page_flag = False
+                    continue
 
             if any(keyword in title.lower() for keyword in exclude_keywords):
+                print("No Match, IF : " , page_num , " - ", title) # debug
                 next_page_flag = False
                 continue
+
+            else:
+                print("No Match, ELSE : " , page_num , " - ", title) # debug
+
             
     return list_of_pages
 
@@ -102,7 +112,7 @@ def get_tableofcontents(filename):
 
 # Example usage:
 if __name__ == '__main__':
-    pdf_file_path =  'klk-annual.pdf'  # Replace with your PDF file path
+    pdf_file_path =  os.path.join("pdf", "vis-annual.pdf")  # Replace with your PDF file path
     page_titles = extract_titles_from_pdf(pdf_file_path)
     page_numbers = split_into_sections(page_titles)
     get_tableofcontents(pdf_file_path)
