@@ -50,17 +50,17 @@ def analyze_text_with_gemini(text):
 
     EXTRACT THE FOLLOWING INFORMATION:
 
-    1.  **Executive Directors**: (title, name, total remuneration (salary, bonuses, others if available), and age). If age is not explicitly stated, do not attempt to calculate or estimate it.
+    1.  **Executive Directors**: (title, name, total remuneration (salary, bonuses, others if available), and age). If age is not explicitly stated, do not attempt to calculate or estimate it. For salary, if there are two sources, for example, remuneration from the company and the group, sum both in the respected place. 
 
-    2.  **Geographical Segments**: (total revenue and percentage).
+    2.  **Geographical Segments/Geographical Information**: (name, total revenue and percentage). Only take values from geographical segment or geographical information. Ignore if stated with "-". Prioritize the information found in financial statements related section in the report or operating segments in the report.
 
-    3.  **Business Segments**: (total revenue and percentage).
+    3.  **Business Segments**: (name, total revenue and percentage). Read "-" as 0. Prioritize the information found in financial statements related section in the report or operating segments in the report.
 
     4.  **Major Customers**: (total revenue and percentage).
 
     5.  **Corporate Structure**:
-        -   **Subsidiaries (own >= 50%)**: Extract name, principal activities, and ownership percentage.
-        -   **Associates (own < 50%)**: Extract name, principal activities, and ownership percentage.
+        -   **Subsidiaries (own >= 50%)**: Extract name, principal activities, and ownership percentage from 1 to 100.
+        -   **Associates (own < 50%)**: Extract name, principal activities, and ownership percentage from 1 to 100.
         -   **Subsidiaries/Associates (Unknown ownership)**: Extract name and principal activities.
 
     6.  **Land Areas**: (in square feet).
@@ -86,7 +86,7 @@ def analyze_text_with_gemini(text):
         response = model.generate_content(prompt + "\n\n" + text)
 
         # Extract JSON using regex to handle extra text
-        match = re.search(r"\{.*\}", response.text, re.DOTALL)
+        match = re.search(r"\{.*}", response.text, re.DOTALL)
         if match:
             json_text = match.group(0)
         else:
@@ -109,7 +109,7 @@ def analyze_text_with_gemini(text):
 
 if __name__ == "__main__":
     # Specify the PDF path here:
-    pdf_path = "tex-cycle_abridged.pdf"  # Replace with the actual path to your PDF file
+    pdf_path = "kgb-annual_abridged.pdf"  # Replace with the actual path to your PDF file
 
     if not os.path.exists(pdf_path):
         print(f"Error: PDF file '{pdf_path}' not found.")
