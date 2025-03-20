@@ -48,54 +48,58 @@ def extract_text_from_pdf(pdf_path):
 def analyze_text_with_gemini(pdf_path):
     """Send extracted text to Gemini AI and get structured JSON data, with improved error handling."""
     prompt = f"""
-        You are an expert in financial analysis and annual reports. Your ABSOLUTE TOP PRIORITY is to extract specific information from the provided text and output the response in a STRICTLY VALID JSON format. If information is not found, leave the corresponding field empty or null.
+    You are an expert in financial analysis and annual reports with accuracy and no mistakes. Your ABSOLUTE TOP PRIORITY is to extract specific information from the provided text and output the response in a STRICTLY VALID JSON format. If information is not found, leave the corresponding field empty or null.
 
-        EXTRACT THE FOLLOWING INFORMATION:
+    EXTRACT THE FOLLOWING INFORMATION:
 
-        1.  **Executive Directors**: (title, name, total remuneration (salary, bonuses, others if available), and age). If age is not explicitly stated, do not attempt to calculate or estimate it. For salary, if there are two sources, for example, remuneration from the company and the group, sum both in the respected place. Exclude resigned director, only extract from current executive directors.
+    1.  **Executive Directors**: (title, name, total remuneration (salary, bonuses, others if available), and age). If age is not explicitly stated, do not attempt to calculate or estimate it. For salary, if there are two sources, for example, remuneration from the company and the group, sum both in the respected place. Exclude resigned director, only extract from current executive directors.
+    
+    2. For 2a and 2b below, go to the table of content of the annual report, find the "FINANCIAL STATEMENTS" section, then go to the "Notes To The Financial Statements" subsection and only search for the answers in those pages.
+    
+    2a.  **Geographical Segments/Geographical Information**: (name, total revenue and percentage).
+        *   Only take values from the "Geographical Segments" or "Geographical Information".
+        *   **DO NOT USE** any values from REVIEW OF PERFORMANCE or REVIEW OF FINANCIAL PERFORMANCE section.
+        *   Ignore if stated with "-".
 
-        2.  **Geographical Segments/Geographical Information**: (name, total revenue and percentage).
-            *   Only take values from the "Geographical Segments" or "Geographical Information" section in the "Notes To The Financial Statements" part. If this information is presented in a table, extract the data from the table rows.
-            *   Do not use any values from Review of Performance or Review of Financial Performance.
-            *   **CRITICAL:** If you cannot find a table with geographical segments information in the financial statements or operating segments, set the entire "Geographical Segments" value to null. Do NOT use information from other sections of the report.**
-            *   Ignore if stated with "-".
+    2b.  **Business Segments**: (name, total revenue and percentage).
+        *   You MUST find a section titled "Business Segments" or "Business Information".
+        *   **DO NOT USE** any values from "REVIEW OF PERFORMANCE" or "REVIEW OF FINANCIAL PERFORMANCE".
+        *   These accurate revenue numbers are in tables. Avoid revenue found in paragraph or in long text.
+        *   The **first priority** for revenue extraction is **"External Operating Revenue".**  
+        *   If "External Operating Revenue" is **not found**, extract **"Total Operating Revenue"** as a fallback.
+        *   Read "-" as 0 (zero). If a business segment has a revenue of zero, represent the revenue as 0 and the percentage as 0.0.
 
-        3.  **Business Segments**: (name, total revenue and percentage).
-            *   **CRITICAL:** You MUST find a section explicitly titled "Business Segments or Business Information" in the "Notes To The Financial Statements" section of the annual report.
-            *   **AVOID** using numbers from *Review Of Performance or Review Of Financial Performance*.
-            *   Read "-" as 0 (zero). If a business segment has a revenue of zero, represent the revenue as 0 (a number) and the percentage as 0.0 (a number).
+    3.  **Major Customers**: (name, total revenue and percentage).
 
-        4.  **Major Customers**: (name, total revenue and percentage).
+    4.  **Corporate Structure**:
+            -   **Subsidiaries (own >= 50%)**: Extract name, principal activities, and ownership percentage from 1 to 100.
+            -   **Associates (own < 50%)**: Extract name, principal activities, and ownership percentage from 1 to 100.
+            -   **Subsidiaries/Associates (Unknown ownership)**: Extract name and principal activities.
 
-        5.  **Corporate Structure**:
-                -   **Subsidiaries (own >= 50%)**: Extract name, principal activities, and ownership percentage from 1 to 100.
-                -   **Associates (own < 50%)**: Extract name, principal activities, and ownership percentage from 1 to 100.
-                -   **Subsidiaries/Associates (Unknown ownership)**: Extract name and principal activities.
+    5.  **Land Areas**: (in square feet).
 
-        6.  **Land Areas**: (in square feet).
+    6.  **Top 30 Shareholders**:
+            -   **Date of shareholdings update**
+            -   **Total number of shares**
+            -   **Treasury shares (if applicable)**
+            -   List all shareholders and state their percentage. If more than 30 shareholders are listed, only include the top 30.
 
-        7.  **Top 30 Shareholders**:
-                -   **Date of shareholdings update**
-                -   **Total number of shares**
-                -   **Treasury shares (if applicable)**
-                -   List all shareholders and state their percentage. If more than 30 shareholders are listed, only include the top 30.
+    OUTPUT REQUIREMENTS (MUST BE FOLLOWED EXACTLY):
 
-        OUTPUT REQUIREMENTS (MUST BE FOLLOWED EXACTLY):
-
-        *   THE OUTPUT MUST BE A VALID JSON OBJECT. THIS IS YOUR TOP PRIORITY.
-        *   Use clear and descriptive keys for each extracted field.
-        *   IF A SPECIFIC PIECE OF INFORMATION IS NOT FOUND IN THE TEXT, SET THE CORRESPONDING VALUE TO `null`. DO NOT MAKE UP INFORMATION.
-        *   Ensure that numerical values are represented as NUMBERS (e.g., 1234567.89), NOT STRINGS ("1234567.89"). Percentages should be decimals (e.g., 0.25 for 25%).
-        *   Arrays should be used to represent lists of items (e.g., a list of Executive Directors).
-        *   Include ALL the fields from the example, even if the value is `null`.
-        """
+    *   THE OUTPUT MUST BE A VALID JSON OBJECT.  THIS IS YOUR TOP PRIORITY.
+    *   Use clear and descriptive keys for each extracted field.
+    *   IF A SPECIFIC PIECE OF INFORMATION IS NOT FOUND IN THE TEXT, SET THE CORRESPONDING VALUE TO `null`. DO NOT MAKE UP INFORMATION.
+    *   Ensure that numerical values are represented as NUMBERS (e.g., 1234567.89), NOT STRINGS ("1234567.89"). Percentages should be decimals (e.g., 0.25 for 25%).
+    *   Arrays should be used to represent lists of items (e.g., a list of Executive Directors).
+    *   Include ALL the fields from the example, even if the value is `null`.
+    """
 
     try:
         # Generate content using Gemini AI
         response = client.models.generate_content(
             model="gemini-2.0-flash",
             config=types.GenerateContentConfig(
-                temperature=0.5  # Low temperature for consistent outputs, low randomness
+                temperature=0.1  # Low temperature for consistent outputs, low randomness
             ),
             contents=[
                 types.Part.from_bytes(
