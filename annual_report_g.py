@@ -53,15 +53,17 @@ def analyze_text_with_gemini(text):
     1.  **Executive Directors**: (title, name, total remuneration (salary, bonuses, others if available), and age). If age is not explicitly stated, do not attempt to calculate or estimate it. For salary, if there are two sources, for example, remuneration from the company and the group, sum both in the respected place. Exclude resigned director, only extract from current executive directors.
 
     2.  **Geographical Segments/Geographical Information**: (name, total revenue and percentage).
-        *   Only take values from the "Geographical Segments" section within the "Notes To The Financial Statements". If this information is presented in a table, extract the data from the table rows.
+        *   Only take values from the "Geographical Segments" or "Geographical Information" section in the "NOTES TO THE FINANCIAL STATEMENTS" part.
+        *   **DO NOT USE** any values from Review of Performance or Review of Financial Performance. This is critical and important to ensure accuracy.
+        *   Explicitly find the numbers in pages that contain "NOTES TO THE FINANCIAL STATEMENTS".
         *   **CRITICAL:** If you cannot find a table with geographical segments information in the financial statements or operating segments, set the entire "Geographical Segments" value to null. Do NOT use information from other sections of the report.**
         *   Ignore if stated with "-".
 
     3.  **Business Segments**: (name, total revenue and percentage).
-        *   **CRITICAL:** You MUST find a section explicitly titled "Business Segments or Business Information" *within the "Notes To The Financial Statements"* section of the annual report.
-        *   **AVOID** using numbers from *Review Of Performance or Review Of Financial Performance*.
-        *   **TABLE FORMAT REQUIRED:** This section MUST contain a clearly defined table with rows for each business segment and columns for "name" (business segment), "total revenue" (numerical value), and "percentage" (decimal value representing the percentage of total revenue).
-        *   **If you CANNOT find a section with the EXACT title specified above that ALSO contains a clearly defined table with the required columns, then you MUST set the entire "Business Segments" value to null. Do NOT try to extract business segment information from any other part of the document if you cannot find a table in the specified section.**
+        *   You MUST find a section explicitly titled "Business Segments" or "Business Information" in the "NOTES TO THE FINANCIAL STATEMENTS" section of the annual report.
+        *   **DO NOT USE** any values from Review of Performance or Review of Financial Performance. This is critical and important to ensure accuracy.
+        *   Explicitly find the numbers in pages that contain "NOTES TO THE FINANCIAL STATEMENTS".
+        *   These accurate revenue numbers are in tables. So, prioritize the numbers that are in tables. Avoid revenue stated in paragraph.
         *   Read "-" as 0 (zero). If a business segment has a revenue of zero, represent the revenue as 0 (a number) and the percentage as 0.0 (a number).
 
     4.  **Major Customers**: (name, total revenue and percentage).
@@ -81,7 +83,7 @@ def analyze_text_with_gemini(text):
 
     OUTPUT REQUIREMENTS (MUST BE FOLLOWED EXACTLY):
 
-    *   THE OUTPUT MUST BE A VALID JSON OBJECT. THIS IS YOUR TOP PRIORITY.
+    *   THE OUTPUT MUST BE A VALID JSON OBJECT.  THIS IS YOUR TOP PRIORITY.
     *   Use clear and descriptive keys for each extracted field.
     *   IF A SPECIFIC PIECE OF INFORMATION IS NOT FOUND IN THE TEXT, SET THE CORRESPONDING VALUE TO `null`. DO NOT MAKE UP INFORMATION.
     *   Ensure that numerical values are represented as NUMBERS (e.g., 1234567.89), NOT STRINGS ("1234567.89"). Percentages should be decimals (e.g., 0.25 for 25%).
