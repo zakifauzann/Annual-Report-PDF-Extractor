@@ -24,27 +24,6 @@ except Exception as e:
     sys.exit(1)
 
 
-def extract_text_from_pdf(pdf_path):
-    """Extract text from a given PDF file, handling potential errors."""
-    try:
-        reader = PdfReader(pdf_path)
-        extracted_text = ""
-        for page in reader.pages:
-            try:
-                page_text = page.extract_text()
-                if page_text:  # Check if text was extracted successfully
-                    extracted_text += page_text + "\n"
-            except Exception as e:
-                print(f"Error extracting text from page")  # Simplified error message
-        return extracted_text
-    except FileNotFoundError:
-        print(f"Error: PDF file not found at path: {pdf_path}")
-        return ""
-    except Exception as e:
-        print(f"Error reading PDF: {e}")
-        return ""
-
-
 def analyze_text_with_gemini(pdf_path):
     """Send extracted text to Gemini AI and get structured JSON data, with improved error handling."""
     prompt = f"""
