@@ -40,7 +40,7 @@ EXTRACT THE FOLLOWING INFORMATION:
 2. **Geographical Segments/Geographical Information**: (name, total revenue, and percentage of total revenue).
     *   Extract data ONLY from the "Geographical Segments" or "Geographical Information" section within the "Notes To The Financial Statements."
     *   Extract the revenue from external customers by geographical location from the annual report. This information is typically located in the notes to the financial statements, often under a section titled "Segment Reporting," "Operating Segments," or "Geographical Segments." 
-    *   The revenue should be broken down by geographical regions, and the values are expected to be in RM'00
+    *   The revenue should be broken down by geographical regions, and the values are expected to be in RM'000
     *   Extract directly from table rows if the data is presented in a table format.
     *   **CRITICAL:** If a table with geographical segments information is absent in the "Notes To The Financial Statements", set the entire "Geographical Segments" value to `null`. Do NOT use information from other sections of the report.
     *   Ignore rows or segments marked with "-".
@@ -49,6 +49,7 @@ EXTRACT THE FOLLOWING INFORMATION:
     *   From the "Segment Information" table in the "Notes to the Financial Statements" section, extract the external revenue for each business segment. List each business segment along with its corresponding external revenue
     *   Focusing only on the external sales figures for the individual segments.
     *   Get the total revenue per business segment as well
+    *   The values are expected to be in RM'000 , note the currency used in the currency_unit 
     *   **CRITICAL:** You MUST find a section titled "Business Segments," "Business Information," or "Segment Information" in the "Notes To The Financial Statements" section of the annual report.
     *   **AVOID**: Do NOT use numbers from *Review of Performance* or *Review of Financial Performance*.
     *   Treat "-" as 0 (zero). If a business segment has zero revenue, represent the revenue as `0` (a number) and the percentage as `0.0` (a number).
@@ -65,7 +66,7 @@ EXTRACT THE FOLLOWING INFORMATION:
 
 7. **Top 30 Shareholders**:
     *   **Date of shareholdings update**
-    *   **Total number of shares**
+    *   **Total number of shares** (total number of shares issued by the company)
     *   **Treasury shares (if applicable)**
     *   Distinguish between the nominee entities and the individuals or entities they represent. For each entry, list:
         *   The nominee (if applicable, e.g., "BI Nominees (Tempatan) Sdn Bhd").
@@ -73,6 +74,7 @@ EXTRACT THE FOLLOWING INFORMATION:
         *   The number of shares.
         *   If the shareholder is an individual or entity without a nominee, indicate that there is no nominee. Provide the total shares and percentage at the end.
     *   Represent the percentage as numbers from 1 to 100, ie : 2.27% -> 2.27
+    *   Check the next page of the report as well for continuation of shareholder list
 
 OUTPUT REQUIREMENTS (MUST BE FOLLOWED EXACTLY):
 
@@ -122,21 +124,21 @@ OUTPUT REQUIREMENTS (MUST BE FOLLOWED EXACTLY):
             "segment": "Software",
             "external_revenue": 4000000.00,
             "total_revenue" : 4500000.00
-            "unit" : "RM'000"
+            "currency_unit" : "RM'000"
             "percentage": 0.48
             },
             {
             "segment": "Manufacturing",
             "external_revenue": 250000000.00,
             "total_revenue": 350000000.00,
-            "unit" : "RM"
+            "currency_unit" : "RM'000"
             "percentage": 0.42
             },
             {
             "segment": "Services",
             "external_revenue": 1234588.00,
             "total_revenue": 2234500.00,
-            "unit" : "RM'000"
+            "currency_unit" : "RM'000"
             "percentage": 0.10
             }
         ],
@@ -145,12 +147,14 @@ OUTPUT REQUIREMENTS (MUST BE FOLLOWED EXACTLY):
             "customer": "Acme Corp",
             "segment" : "construction"
             "total_revenue": 100000000.00,
+            "currency_unit" : "RM'000"
             "percentage": 0.12
             },
             {
             "customer": "Beta Inc",
             "segment" : "construction"
             "total_revenue": 75000000.00,
+            "currency_unit" : "RM'000"
             "percentage": 0.09
             }
         ],
@@ -207,7 +211,7 @@ OUTPUT REQUIREMENTS (MUST BE FOLLOWED EXACTLY):
         response = client.models.generate_content(
             model="gemini-2.0-flash",
             config=types.GenerateContentConfig(
-                temperature=0.7  # Low temperature for consistent outputs, low randomness
+                temperature=0.5  # Low temperature for consistent outputs, low randomness
             ),
             contents=[
                 types.Part.from_bytes(
@@ -243,7 +247,7 @@ OUTPUT REQUIREMENTS (MUST BE FOLLOWED EXACTLY):
 
 if __name__ == "__main__":
     # Specify the PDF path here:
-    pdf_path = os.path.join("pdf", "hohup_abridged.pdf")  # Replace with the actual path to your PDF file
+    pdf_path = os.path.join("pdf", "dataprp_abridged.pdf")  # Replace with the actual path to your PDF file
 
     if not os.path.exists(pdf_path):
         print(f"Error: PDF file '{pdf_path}' not found.")
