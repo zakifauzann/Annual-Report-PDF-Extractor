@@ -39,6 +39,7 @@ def analyze_text_with_gemini(pdf_path):
         *   Only take values from the "Geographical Segments" or "Geographical Information".
         *   **DO NOT USE** any values from REVIEW OF PERFORMANCE or REVIEW OF FINANCIAL PERFORMANCE section.
         *   Ignore if stated with "-".
+        *   **All revenue figures are in RM'000 (Ringgit Malaysia thousands).** When extracting numerical values, ensure that you are reporting the values in thousands of Ringgit Malaysia. If a number appears without the "RM'000" indicator, assume that it is already in thousands of Ringgit Malaysia.
 
     2b.  **Business Segments**: (name, total revenue and percentage).
         *   You MUST find a section titled "Business Segments" or "Business Information".
@@ -47,8 +48,9 @@ def analyze_text_with_gemini(pdf_path):
         *   The **first priority** for revenue extraction is **"External Operating Revenue".**  
         *   If "External Operating Revenue" is **not found**, extract **"Total Operating Revenue"** as a fallback.
         *   Read "-" as 0 (zero). If a business segment has a revenue of zero, represent the revenue as 0 and the percentage as 0.0.
+        *   **All revenue figures are in RM'000 (Ringgit Malaysia thousands).** When extracting numerical values, ensure that you are reporting the values in thousands of Ringgit Malaysia. If a number appears without the "RM'000" indicator, assume that it is already in thousands of Ringgit Malaysia.
 
-    3.  **Major Customers**: (name, total revenue and percentage).
+    3.  **Major Customers**: (name, total revenue and percentage). Only take values from latest year. Read "-" as 0. If it has a revenue of zero, represent the revenue as 0 and the percentage as 0.0.
 
     4.  **Corporate Structure**:
             -   **Subsidiaries (own >= 50%)**: Extract name, principal activities, and ownership percentage from 1 to 100.
@@ -62,6 +64,12 @@ def analyze_text_with_gemini(pdf_path):
             -   **Total number of shares**
             -   **Treasury shares (if applicable)**
             -   List all shareholders and state their percentage. If more than 30 shareholders are listed, only include the top 30.
+            -   Distinguish between the nominee entities and the individuals or entities they represent. For each entry, list:
+                *   The nominee (if applicable, e.g., "BI Nominees (Tempatan) Sdn Bhd").
+                *   The represented shareholder (if applicable, e.g., "Rajesh A/L Jaikishan" in "Kenanga Nominees (Tempatan) Sdn Bhd for Rajesh A/L Jaikishan").
+                *   The number of shares.
+                *   If the shareholder is an individual or entity without a nominee, indicate that there is no nominee. Provide the total shares and percentage at the end.
+            -   Represent the percentage as numbers from 1 to 100, ie : 2.27% -> 2.27
 
     OUTPUT REQUIREMENTS (MUST BE FOLLOWED EXACTLY):
 
@@ -78,7 +86,7 @@ def analyze_text_with_gemini(pdf_path):
         response = client.models.generate_content(
             model="gemini-2.0-flash",
             config=types.GenerateContentConfig(
-                temperature=0.1  # Low temperature for consistent outputs, low randomness
+                temperature=0.3  # Low temperature for consistent outputs, low randomness
             ),
             contents=[
                 types.Part.from_bytes(
@@ -114,7 +122,7 @@ def analyze_text_with_gemini(pdf_path):
 
 if __name__ == "__main__":
     # Specify the PDF path here:
-    pdf_path = os.path.join('kgb.pdf')  # Replace with the actual path to your PDF file
+    pdf_path = os.path.join('klk-annual_abridged.pdf')  # Replace with the actual path to your PDF file
 
     if not os.path.exists(pdf_path):
         print(f"Error: PDF file '{pdf_path}' not found.")
