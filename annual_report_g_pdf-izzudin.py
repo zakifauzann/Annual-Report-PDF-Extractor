@@ -36,7 +36,6 @@ EXTRACT THE FOLLOWING INFORMATION:
 1. **Executive Directors**: (title, name, age, and total remuneration (salary, bonuses, other compensation, if available)).
     *   If age is not explicitly stated, do not include it.
     *   For salary, if there are multiple sources of remuneration (e.g., from the company and a group entity), sum all applicable amounts and report the total remuneration. Specify the currency.
-    *   Only extract information from the "NOTES TO THE FINANCIAL STATEMENTS" section. Ignore information from other sections of the report.
 
 2. **Geographical Segments/Geographical Information**: (name, total revenue, and percentage of total revenue).
     *   Extract data ONLY from the "Geographical Segments" or "Geographical Information" section within the "Notes To The Financial Statements."
@@ -49,6 +48,7 @@ EXTRACT THE FOLLOWING INFORMATION:
 3. **Business Segments**: (name, total revenue, and percentage of total revenue).
     *   From the "Segment Information" table in the "Notes to the Financial Statements" section, extract the external revenue for each business segment. List each business segment along with its corresponding external revenue
     *   Focusing only on the external sales figures for the individual segments.
+    *   Get the total revenue per business segment as well
     *   **CRITICAL:** You MUST find a section titled "Business Segments," "Business Information," or "Segment Information" in the "Notes To The Financial Statements" section of the annual report.
     *   **AVOID**: Do NOT use numbers from *Review of Performance* or *Review of Financial Performance*.
     *   Treat "-" as 0 (zero). If a business segment has zero revenue, represent the revenue as `0` (a number) and the percentage as `0.0` (a number).
@@ -96,6 +96,7 @@ OUTPUT REQUIREMENTS (MUST BE FOLLOWED EXACTLY):
                 "otherEmoluments": 230623
                 },
             "total remuneration" : 1463123
+            "remuneration_currency_unit":"RM"
             },
     
         ],
@@ -119,17 +120,23 @@ OUTPUT REQUIREMENTS (MUST BE FOLLOWED EXACTLY):
         "business_segments": [
             {
             "segment": "Software",
-            "total_revenue": 400000000.00,
+            "external_revenue": 4000000.00,
+            "total_revenue" : 4500000.00
+            "unit" : "RM'000"
             "percentage": 0.48
             },
             {
             "segment": "Manufacturing",
+            "external_revenue": 250000000.00,
             "total_revenue": 350000000.00,
+            "unit" : "RM"
             "percentage": 0.42
             },
             {
             "segment": "Services",
-            "total_revenue": 83333333.33,
+            "external_revenue": 1234588.00,
+            "total_revenue": 2234500.00,
+            "unit" : "RM'000"
             "percentage": 0.10
             }
         ],
@@ -236,7 +243,7 @@ OUTPUT REQUIREMENTS (MUST BE FOLLOWED EXACTLY):
 
 if __name__ == "__main__":
     # Specify the PDF path here:
-    pdf_path = os.path.join("pdf", "klk-annual_abridged.pdf")  # Replace with the actual path to your PDF file
+    pdf_path = os.path.join("pdf", "hohup_abridged.pdf")  # Replace with the actual path to your PDF file
 
     if not os.path.exists(pdf_path):
         print(f"Error: PDF file '{pdf_path}' not found.")
