@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 import google.generativeai as genai
 
 # Load environment variables
-load_dotenv()
+load_dotenv(os.path.join(os.path.expanduser('~'), ".passkey", ".env"))
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")  # Using GOOGLE_API_KEY
 
 if not GOOGLE_API_KEY:
@@ -93,7 +93,7 @@ def analyze_text_with_gemini(text):
         model = genai.GenerativeModel("gemini-2.0-flash")
      
         generation_config = genai.GenerationConfig(
-                            temperature=0.5,
+                            temperature=0.2,
                         )
 
         response = model.generate_content(prompt + "\n\n" + text, generation_config=generation_config)  # Added temperature parameter
