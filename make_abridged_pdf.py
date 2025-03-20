@@ -5,7 +5,7 @@ possible_keywords = ["management" , "executive", "director" ,"senior management"
                     "chairman statement", "chairman", "discussion and analysis", "discussion", "analysis",
                     "financial statements" , "notes to financial statements", "notes to the financial statements",
                     "corporate info" , "vision and mission", "vision" , "mission" , 
-                    "analysis of shareholdings" , "shareholders" , "shareholding" , "share", 
+                    "analysis of shareholdings" , "shareholders" , "shareholding" , "share", "account" , 
                     "salary" , "remuneration"]
 
 exclude_keywords = ["sustainability report", "sustainability", "risk management", "share buy back" , "audit committee", "compliance"
@@ -114,7 +114,7 @@ def get_tableofcontents(filename):
 
 # Example usage:
 if __name__ == '__main__':
-    pdf_file_path =  os.path.join("pdf", "kgb-annual.pdf")  # Replace with your PDF file path
+    pdf_file_path =  os.path.join("pdf", "rohas-annual.pdf")  # Replace with your PDF file path
     page_titles = extract_titles_from_pdf(pdf_file_path)
     page_numbers = split_into_sections(page_titles)
     get_tableofcontents(pdf_file_path)
