@@ -1,8 +1,9 @@
 import fitz  # pymupdf is imported as fitz
 import os
 
-possible_keywords = ["management" , "executive", "director" ,"senior management", "corporate structure", "corporate profile"
-                    "chairman statement", "chairman", "discussion and analysis", "discussion", "analysis",
+possible_keywords = [ "executive", "director" ,"senior management", "corporate structure", "corporate profile"
+                    "chairman statement", "chairman", 
+                    #"discussion and analysis", "discussion", "analysis", "management" 
                     "financial statements" , "notes to financial statements", "notes to the financial statements",
                     "subsidiary", "subsidiaries", "associate", "associates", "business segment" , "geographical segments"
                     "corporate info" , "vision and mission", "vision" , "mission" , 
@@ -10,7 +11,8 @@ possible_keywords = ["management" , "executive", "director" ,"senior management"
                     "salary" , "remuneration"]
 
 exclude_keywords = ["sustainability report", "sustainability", "risk management", "share buy back" , "audit committee", "compliance"
-                    "governance" , "internal control" , "general meeting" , "General Meetings" , "buy-back" , "mesyuarat", "audit" , "auditor"]
+                    "governance" , "internal control" , "general meeting" , "General Meetings" , "buy-back" , "mesyuarat", "audit" , "auditor"
+                    "management discussion and analysis"]
 
 def extract_titles_from_pdf(pdf_path):
     """
