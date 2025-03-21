@@ -1,8 +1,7 @@
 import os
 import json
 import sys
-import re  # Import the regular expression module
-from pypdf import PdfReader
+import re
 from dotenv import load_dotenv
 from google import genai
 from google.genai import types
@@ -32,34 +31,28 @@ def analyze_text_with_gemini(pdf_path):
     EXTRACT THE FOLLOWING INFORMATION:
 
     1.  **Executive Directors**: (title, name, total remuneration (salary, bonuses, others if available), and age). If age is not explicitly stated, do not attempt to calculate or estimate it. For salary, if there are two sources, for example, remuneration from the company and the group, sum both in the respected place. Exclude resigned director, only extract from current executive directors.
-    
-    2. For 2a and 2b below, go to the table of content of the annual report, find the "FINANCIAL STATEMENTS" section, then go to the "Notes To The Financial Statements" subsection and only search for the answers in those pages.
-    
-    2a.  **Geographical Segments/Geographical Information**: (name, total revenue and percentage).
-        *   Only take values from the "Geographical Segments" or "Geographical Information".
-        *   **DO NOT USE** any values from REVIEW OF PERFORMANCE or REVIEW OF FINANCIAL PERFORMANCE section.
+
+    2.  **Geographical Segments/Geographical Information**: (name, total revenue and percentage).
+        *   Only take values from the "Geographical Segments" or "Geographical Information" section.
         *   Ignore if stated with "-".
         *   **All revenue figures are in RM'000 (Ringgit Malaysia thousands).** When extracting numerical values, ensure that you are reporting the values in thousands of Ringgit Malaysia. If a number appears without the "RM'000" indicator, assume that it is already in thousands of Ringgit Malaysia.
 
-    2b.  **Business Segments**: (name, total revenue and percentage).
+    3.  **Business Segments**: (name, total revenue and percentage).
         *   You MUST find a section titled "Business Segments" or "Business Information".
-        *   **DO NOT USE** any values from "REVIEW OF PERFORMANCE" or "REVIEW OF FINANCIAL PERFORMANCE".
-        *   These accurate revenue numbers are in tables. Avoid revenue found in paragraph or in long text.
-        *   The **first priority** for revenue extraction is **"External Operating Revenue".**  
-        *   If "External Operating Revenue" is **not found**, extract **"Total Operating Revenue"** as a fallback.
+        *   The **first priority** for revenue extraction is **"Total Operating Revenue".**
         *   Read "-" as 0 (zero). If a business segment has a revenue of zero, represent the revenue as 0 and the percentage as 0.0.
         *   **All revenue figures are in RM'000 (Ringgit Malaysia thousands).** When extracting numerical values, ensure that you are reporting the values in thousands of Ringgit Malaysia. If a number appears without the "RM'000" indicator, assume that it is already in thousands of Ringgit Malaysia.
 
-    3.  **Major Customers**: (name, total revenue and percentage). Only take values from latest year. Read "-" as 0. If it has a revenue of zero, represent the revenue as 0 and the percentage as 0.0.
+    4.  **Major Customers**: (name, total revenue, year and percentage). "-" in the table means no revenue available for that year. Count as null. If the revenue for the current year is not available or not present in the table, also count as null.
 
-    4.  **Corporate Structure**:
+    5.  **Corporate Structure**:
             -   **Subsidiaries (own >= 50%)**: Extract name, principal activities, and ownership percentage from 1 to 100.
             -   **Associates (own < 50%)**: Extract name, principal activities, and ownership percentage from 1 to 100.
             -   **Subsidiaries/Associates (Unknown ownership)**: Extract name and principal activities.
 
-    5.  **Land Areas**: (in square feet).
+    6.  **Land Areas**: (in square feet).
 
-    6.  **Top 30 Shareholders**:
+    7.  **Top 30 Shareholders**:
             -   **Date of shareholdings update**
             -   **Total number of shares**
             -   **Treasury shares (if applicable)**
@@ -122,7 +115,7 @@ def analyze_text_with_gemini(pdf_path):
 
 if __name__ == "__main__":
     # Specify the PDF path here:
-    pdf_path = os.path.join('klk-annual_abridged.pdf')  # Replace with the actual path to your PDF file
+    pdf_path = os.path.join('kgb_abridged.pdf')  # Replace with the actual path to your PDF file
 
     if not os.path.exists(pdf_path):
         print(f"Error: PDF file '{pdf_path}' not found.")
