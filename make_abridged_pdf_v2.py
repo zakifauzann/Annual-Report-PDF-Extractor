@@ -5,7 +5,7 @@ possible_keywords = ["management" , "executive", "director" ,"senior management"
                     "chairman statement", "chairman", "discussion and analysis", "discussion", "analysis",
                     "financial statements" , "notes to financial statements", "notes to the financial statements",
                     "corporate info" , "vision and mission", "vision" , "mission" , 
-                    "analysis of shareholdings" , "shareholders" , "shareholding" , "share", 
+                    "analysis of shareholdings" , "shareholders" , "shareholding" , "share", "account" , 
                     "salary" , "remuneration"]
 
 statement_keywords = ["financial statements" , "notes to financial statements", "notes to the financial statements"]
@@ -123,7 +123,7 @@ def get_tableofcontents(filename):
 
 # Example usage:
 if __name__ == '__main__':
-    pdf_file_path =  os.path.join("pdf", "kgb-annual.pdf")  # Replace with your PDF file path
+    pdf_file_path =  os.path.join("pdf", "rohas-annual.pdf")  # Replace with your PDF file path
     page_titles = extract_titles_from_pdf(pdf_file_path)
     page_numbers = split_into_sections(page_titles, pdf_file_path)
     get_tableofcontents(pdf_file_path)
@@ -131,7 +131,7 @@ if __name__ == '__main__':
    # make new pdf from the page numbers in sections
     with open(pdf_file_path, 'rb') as pdf_file:
         doc = fitz.open(pdf_file_path)  # Open the PDF using fitz
-        new_pdf_name = pdf_file_path.split('.')[0] + '_abridged.pdf'
+        new_pdf_name = pdf_file_path.split('.')[0] + '_abridged_v2.pdf'
         doc.select(page_numbers)
         doc.save(new_pdf_name)
         

@@ -48,7 +48,7 @@ def extract_titles_from_pdf(pdf_path):
 
             potential_title = ""
             # Heuristic: Take the first few lines as the potential title
-            num_title_lines = min(4, len(lines))  # Consider up to 6 lines
+            num_title_lines = min(5, len(lines))  # Consider up to 6 lines
 
             for i in range(num_title_lines):
                 line = lines[i].strip()  # Remove leading/trailing whitespace
@@ -114,7 +114,7 @@ def get_tableofcontents(filename):
 
 # Example usage:
 if __name__ == '__main__':
-    pdf_file_path =  os.path.join("pdf", "dataprp.pdf")  # Replace with your PDF file path
+    pdf_file_path =  os.path.join("pdf", "qes.pdf")  # Replace with your PDF file path
     page_titles = extract_titles_from_pdf(pdf_file_path)
     page_numbers = split_into_sections(page_titles)
     get_tableofcontents(pdf_file_path)
