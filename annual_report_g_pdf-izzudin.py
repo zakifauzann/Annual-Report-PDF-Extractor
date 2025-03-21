@@ -36,26 +36,27 @@ EXTRACT THE FOLLOWING INFORMATION:
 1. **Executive Directors**: (title, name, age, and total remuneration (salary, bonuses, other compensation, if available)).
     *   If age is not explicitly stated, do not include it.
     *   For salary, if there are multiple sources of remuneration (e.g., from the company and a group entity), sum all applicable amounts and report the total remuneration. Specify the currency.
+    *   If total remuneration is not available or cannot be reliably calculated, set the `total_remuneration` to `null`.
 
 2. **Geographical Segments/Geographical Information**: (name, total revenue, and percentage of total revenue).
     *   Extract data ONLY from the "Geographical Segments" or "Geographical Information" section within the "Notes To The Financial Statements."
-    *   Extract the revenue from external customers by geographical location from the annual report. This information is typically located in the notes to the financial statements, often under a section titled "Segment Reporting," "Operating Segments," or "Geographical Segments." 
+    *   Extract the revenue from external customers by geographical location from the annual report. This information is typically located in the notes to the financial statements, often under a section titled "Segment Reporting," "Operating Segments," or "Geographical Segments."
     *   The revenue should be broken down by geographical regions, and the values are expected to be in RM'000
+    *   Revenue from external customers by geographical location of customers
     *   Extract directly from table rows if the data is presented in a table format.
     *   **CRITICAL:** If a table with geographical segments information is absent in the "Notes To The Financial Statements", set the entire "Geographical Segments" value to `null`. Do NOT use information from other sections of the report.
-    *   Ignore rows or segments marked with "-".
+    *   Ignore rows or segments marked with "-". If a segment is ignored, do not include the corresponding key-value pair.
 
 3. **Business Segments**: (name, total revenue, and percentage of total revenue).
-    *   From the "Segment Information" table in the "Notes to the Financial Statements" section, extract the external revenue for each business segment. List each business segment along with its corresponding external revenue
-    *   Focusing only on the external sales figures for the individual segments.
+    *   From the "Segment Information" table in the "Notes to the Financial Statements" section, extract the total revenue for each business segment. List each business segment along with its corresponding external revenue
     *   Get the total revenue per business segment as well
-    *   The values are expected to be in RM'000 , note the currency used in the currency_unit 
+    *   The values are expected to be in RM'000 , note the currency used in the currency_unit
     *   **CRITICAL:** You MUST find a section titled "Business Segments," "Business Information," or "Segment Information" in the "Notes To The Financial Statements" section of the annual report.
     *   **AVOID**: Do NOT use numbers from *Review of Performance* or *Review of Financial Performance*.
     *   Treat "-" as 0 (zero). If a business segment has zero revenue, represent the revenue as `0` (a number) and the percentage as `0.0` (a number).
 
-4. **Major Customers**: (customers with revenue equal to or more than 10% of total revenue; include total revenue from each customer and percentage of total revenue).
-    *   **CRITICAL:** You MUST find a section titled "MAJOR CUSTOMERS" or "Information on major customers" within the "Notes To The Financial Statements" section of the annual report.
+4.  **Major Customers**: (name, total revenue, year and percentage). "-" in the table means no revenue available for that year. Count as null. If the revenue for the current year is not available or not present in the table, also count as null.
+
 
 5. **Corporate Structure**: (information from *INVESTMENT IN SUBSIDIARIES*, *SUBSIDIARIES, ASSOCIATES AND JOINT VENTURES*, *SUBSIDIARIES*, or related sections)
     *   **Subsidiaries (ownership >= 50%)**: Extract name, principal activities, and ownership percentage (as a number from 1 to 100).
@@ -81,10 +82,9 @@ OUTPUT REQUIREMENTS (MUST BE FOLLOWED EXACTLY):
 *   THE OUTPUT MUST BE A VALID JSON OBJECT.  THIS IS YOUR TOP PRIORITY.
 *   Use clear and descriptive keys for each extracted field.
 *   IF A SPECIFIC PIECE OF INFORMATION IS NOT FOUND IN THE TEXT, SET THE CORRESPONDING VALUE TO `null`. DO NOT MAKE UP INFORMATION.
-*   Ensure that numerical values are represented as NUMBERS (e.g., 1234567.89), NOT STRINGS ("1234567.89"). Percentages should be decimals (e.g., 0.25 for 25%).
+*   Ensure that numerical values are represented as NUMBERS (e.g., 1234567.89), NOT STRINGS ("1234567.89"). Percentages should be numbers (e.g., 25.0 for 25%).
 *   Arrays should be used to represent lists of items (e.g., a list of Executive Directors).
-*   Include ALL the fields/keys from the example, even if the value is `null`. This maintains a consistent JSON structure.
-
+*   Include ALL the fields/keys from the example structure (provided below, or in previous turns), even if the value is `null`. This maintains a consistent JSON structure.
         {
         "executive_directors": [
             {
@@ -122,40 +122,37 @@ OUTPUT REQUIREMENTS (MUST BE FOLLOWED EXACTLY):
         "business_segments": [
             {
             "segment": "Software",
-            "external_revenue": 4000000.00,
             "total_revenue" : 4500000.00
-            "currency_unit" : "RM'000"
+            "currency_unit" : "RM'000",
             "percentage": 0.48
             },
             {
             "segment": "Manufacturing",
-            "external_revenue": 250000000.00,
             "total_revenue": 350000000.00,
-            "currency_unit" : "RM'000"
+            "currency_unit" : "RM'000",
             "percentage": 0.42
             },
             {
             "segment": "Services",
-            "external_revenue": 1234588.00,
             "total_revenue": 2234500.00,
-            "currency_unit" : "RM'000"
+            "currency_unit" : "RM'000",
             "percentage": 0.10
             }
         ],
         "major_customers": [
             {
-            "customer": "Acme Corp",
+            "customer name": "Customer 2",
             "segment" : "construction"
-            "total_revenue": 100000000.00,
+            "total_revenue": 0,
             "currency_unit" : "RM'000"
-            "percentage": 0.12
+            "percentage": 0,
             },
             {
-            "customer": "Beta Inc",
+            "customer name": "Customer C",
             "segment" : "construction"
             "total_revenue": 75000000.00,
             "currency_unit" : "RM'000"
-            "percentage": 0.09
+            "percentage": 0.09,
             }
         ],
         "corporate_structure": {
@@ -191,7 +188,7 @@ OUTPUT REQUIREMENTS (MUST BE FOLLOWED EXACTLY):
             "unit"  : "hectares"/"sq ft"}
         ],
         "top_30_shareholders": {
-            "shareholdings_update_date": "2023-12-31",
+            "shareholdings_update_date": "DAY-MONTH-YEAR",
             "total_shares": 10000000.00,
             "treasury_shares": 500000.00,
             "shareholders": [
@@ -245,22 +242,49 @@ OUTPUT REQUIREMENTS (MUST BE FOLLOWED EXACTLY):
         return {}
 
 
-if __name__ == "__main__":
-    # Specify the PDF path here:
-    pdf_path = os.path.join("pdf", "dataprp_abridged.pdf")  # Replace with the actual path to your PDF file
+def calculate_percentage(structured_data):
 
-    if not os.path.exists(pdf_path):
-        print(f"Error: PDF file '{pdf_path}' not found.")
-        sys.exit(1)
+    # Calculate percentage for segments
+    geographical_segments = structured_data.get('geographical_segments', []) 
+    if geographical_segments:
+        total_revenue = sum(segment['total_revenue'] for segment in geographical_segments if segment.get('total_revenue') is not None)
+        for segment in geographical_segments:
+            if segment.get('total_revenue') is not None:
+                segment['percentage'] = (segment['total_revenue'] / total_revenue * 100) if total_revenue > 0 else 0
+            else:
+                segment['percentage'] = 0  # Handle NoneType
 
-    print(f"Processing PDF: {pdf_path}")
+    # Calculate percentage for business segments
+    business_segments = structured_data.get('business_segments', [])
+    if business_segments:
+        total_business_revenue = sum(business['total_revenue'] for business in business_segments if business.get('total_revenue') is not None)
+        for business in business_segments:
+            if business.get('total_revenue') is not None:
+                business['percentage'] = (business['total_revenue'] / total_business_revenue * 100) if total_business_revenue > 0 else 0
+            else:
+                business['percentage'] = 0  # Handle NoneType
 
+    # Calculate percentage for major customers
+    major_customers = structured_data.get('major_customers', [])
+    if major_customers:
+        total_customer_revenue = sum(customer['total_revenue'] for customer in major_customers if customer.get('total_revenue') is not None)
+        for customer in major_customers:
+            if customer.get('total_revenue') is not None:
+                customer['percentage'] = (customer['total_revenue'] / total_customer_revenue * 100) if total_customer_revenue > 0 else 0
+            else:
+                customer['percentage'] = 0  # Handle NoneType
 
-    structured_data = analyze_text_with_gemini(pdf_path)
+    calc_data = structured_data
+    return calc_data
 
+def save_json(structured_data, pdf_path, calc_flag = False):
     # Change output file name to match the PDF file name
     pdf_file_name = os.path.splitext(os.path.basename(pdf_path))[0]  # Get PDF file name without extension
-    output_file = os.path.join("json" , f"{pdf_file_name}_pdf.json")
+    if not calc_flag:
+        output_file = os.path.join("json" , f"{pdf_file_name}_pdf.json")
+    elif calc_flag:
+        output_file = os.path.join("json" , f"{pdf_file_name}_calc.json")
+
 
     try:
         with open(output_file, "w", encoding="utf-8") as f:
@@ -268,3 +292,27 @@ if __name__ == "__main__":
         print(f"Extraction complete! Data saved to {output_file}")
     except Exception as e:
         print(f"ERROR: Error writing to file: {e}")
+    
+
+if __name__ == "__main__":
+    # Specify the PDF path here:
+    pdf_path = os.path.join("pdf", "kgb-annual_abridged.pdf")  # Replace with the actual path to your PDF file
+
+    if not os.path.exists(pdf_path):
+        print(f"Error: PDF file '{pdf_path}' not found.")
+        sys.exit(1)
+
+    print(f"Processing PDF: {pdf_path}")
+
+    # save data from AI
+    structured_data = analyze_text_with_gemini(pdf_path)
+    save_json(structured_data , pdf_path)
+
+    # do calc then 
+    pdf_file_name = os.path.splitext(os.path.basename(pdf_path))[0]  # Get PDF file name without extension
+    with open(os.path.join("json", f"{pdf_file_name}_pdf.json"), "r", encoding='utf-8') as data:
+        json_data = json.load(data)  # Load JSON data from the file
+
+    calc_data = calculate_percentage(json_data)
+    save_json(calc_data , pdf_path, calc_flag=True)
+
