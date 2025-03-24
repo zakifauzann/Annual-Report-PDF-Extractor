@@ -30,29 +30,38 @@ def analyze_text_with_gemini(pdf_path):
 
     EXTRACT THE FOLLOWING INFORMATION:
 
-    1.  **Executive Directors**: (title, name, total remuneration (salary, bonuses, others if available), and age). If age is not explicitly stated, do not attempt to calculate or estimate it. For salary, if there are two sources, for example, remuneration from the company and the group, sum both in the respected place. Exclude resigned director, only extract from current executive directors.
-
-    2.  **Geographical Segments/Geographical Information**: (name, total revenue and percentage).
-        *   Only take values from the "Geographical Segments" or "Geographical Information" section.
-        *   Ignore if stated with "-".
+    1.  Extract details for the following executive positions: Chief Executive Officer (CEO), Group Managing Director, Chief Operating Officer (COO), and Executive Directors. Include:
+        *   Title
+        *   Name
+        *   Total remuneration (sum of salary, bonuses, and other components if available)
+        *   Age (only if explicitly stated; do not estimate)
+        *   Exclusions:
+        *   Do not include resigned directors—extract only current executives.
+        *   Do not include non-executive directors.
+    
+    2.  **Segmental Information** (Follow the instructions below):
+        *   ONLY take revenue values from the "Segments Information" or "Segmental Information" subsection. DO NOT take from everywhere else.
+        *   ONLY take revenue values from **"Total Operating Revenue"** or **"Total Revenue"**. DO NOT take values from **External Revenue** or **External Customers**.
+        *   Calculate the percentage if the revenue has value.
+        *   If revenues are found first before segmental information, just discard them and use revenues under Segmental Information subsection.
         *   **All revenue figures are in RM'000 (Ringgit Malaysia thousands).** When extracting numerical values, ensure that you are reporting the values in thousands of Ringgit Malaysia. If a number appears without the "RM'000" indicator, assume that it is already in thousands of Ringgit Malaysia.
+    
+        2a. **Geographical Segments/Geographical Information**: (name, total revenue and percentage).
+            *   Ignore if stated with "-".
+            
+        2b. **Business Segments/Business Information**: (name, total revenue and percentage).
+            *   Read "-" as 0 (zero).
+        
+    3.  **Major Customers**: (name, total revenue, year and percentage). "-" in the table means no revenue available for that year. Count as null. If the revenue for the current year is not available or not present in the table, also count as null. Calculate the percentage if the revenue has value.
 
-    3.  **Business Segments**: (name, total revenue and percentage).
-        *   You MUST find a section titled "Business Segments" or "Business Information".
-        *   The **first priority** for revenue extraction is **"Total Operating Revenue".**
-        *   Read "-" as 0 (zero). If a business segment has a revenue of zero, represent the revenue as 0 and the percentage as 0.0.
-        *   **All revenue figures are in RM'000 (Ringgit Malaysia thousands).** When extracting numerical values, ensure that you are reporting the values in thousands of Ringgit Malaysia. If a number appears without the "RM'000" indicator, assume that it is already in thousands of Ringgit Malaysia.
-
-    4.  **Major Customers**: (name, total revenue, year and percentage). "-" in the table means no revenue available for that year. Count as null. If the revenue for the current year is not available or not present in the table, also count as null.
-
-    5.  **Corporate Structure**:
+    4.  **Corporate Structure**:
             -   **Subsidiaries (own >= 50%)**: Extract name, principal activities, and ownership percentage from 1 to 100.
             -   **Associates (own < 50%)**: Extract name, principal activities, and ownership percentage from 1 to 100.
             -   **Subsidiaries/Associates (Unknown ownership)**: Extract name and principal activities.
 
-    6.  **Land Areas**: (in square feet).
+    5.  **Land Areas**: (in square feet).
 
-    7.  **Top 30 Shareholders**:
+    6.  **Top 30 Shareholders**:
             -   **Date of shareholdings update**
             -   **Total number of shares**
             -   **Treasury shares (if applicable)**
@@ -87,7 +96,7 @@ def analyze_text_with_gemini(pdf_path):
                     mime_type='application/pdf',
                 ),
                 prompt
-            ]  
+            ]
         )
 
         print(response.usage_metadata)
