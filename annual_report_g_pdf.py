@@ -74,7 +74,7 @@ def analyze_text_with_gemini(url_path):
                 *   If the shareholder is an individual or entity without a nominee, indicate that there is no nominee. Provide the total shares and percentage at the end.
             -   Represent the percentage as numbers from 1 to 100, ie : 2.27% -> 2.27
     7. Company Name
-    
+
     OUTPUT REQUIREMENTS (MUST BE FOLLOWED EXACTLY):
 
     *   THE OUTPUT MUST BE A VALID JSON OBJECT.  THIS IS YOUR TOP PRIORITY.
@@ -126,10 +126,8 @@ def analyze_text_with_gemini(url_path):
         return {}
 
 
-if __name__ == "__main__":
+def from_db_link(url_path):
     # Specify the PDF path here:
-    url_path = "https://anns.sgp1.cdn.digitaloceanspaces.com/3538766.pdf" # Replace with the actual path to your PDF file
-
     print(f"Processing PDF: {url_path}")
 
 
@@ -145,3 +143,24 @@ if __name__ == "__main__":
         print(f"Extraction complete! Data saved to {output_file}")
     except Exception as e:
         print(f"ERROR: Error writing to file: {e}")
+
+
+# if __name__ == "__main__":
+#     # Specify the PDF path here:
+#     url_path = "https://anns.sgp1.cdn.digitaloceanspaces.com/3538766.pdf" # Replace with the actual path to your PDF file , en
+
+#     print(f"Processing PDF: {url_path}")
+
+
+#     structured_data = analyze_text_with_gemini(url_path)
+
+#     # Change output file name to match the PDF file name
+#     pdf_file_name = os.path.splitext(os.path.basename(url_path))[0]  # Get PDF file name without extension
+#     output_file = f"{pdf_file_name}_extracted.json"
+
+#     try:
+#         with open(output_file, "w", encoding="utf-8") as f:
+#             json.dump(structured_data, f, indent=4, ensure_ascii=False)  # Ensure UTF-8 encoding
+#         print(f"Extraction complete! Data saved to {output_file}")
+#     except Exception as e:
+#         print(f"ERROR: Error writing to file: {e}")
