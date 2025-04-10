@@ -130,7 +130,6 @@ def from_db_link(url_path):
     # Specify the PDF path here:
     print(f"Processing PDF: {url_path}")
 
-
     structured_data = analyze_text_with_gemini(url_path)
 
     # Change output file name to match the PDF file name
