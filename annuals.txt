@@ -1,0 +1,99 @@
+prompt = f"""
+    You are an expert in financial analysis and annual reports with accuracy and no mistakes. Your ABSOLUTE TOP PRIORITY is to extract specific information from the provided text and output the response in a STRICTLY VALID JSON format. If information is not found, leave the corresponding field empty or null.
+
+    EXTRACT THE FOLLOWING INFORMATION:
+
+    1.  Extract details for the following executive positions: Chief Executive Officer (CEO), Group Managing Director, Chief Operating Officer (COO), and Executive Directors. Include:
+        *   Title
+        *   Name
+        *   Total remuneration (sum of salary, bonuses, and other components if available)
+        *   Age (only if explicitly stated; do not estimate)
+        *   Exclusions:
+        *   Do not include resigned directors—extract only current executives.
+        *   Do not include non-executive directors.
+
+    2.  **Segmental Information** (Follow the instructions below):
+        *   ONLY take revenue values from the "Segments Information" or "Segmental Information" subsection. DO NOT take from everywhere else.
+        *   ONLY take revenue values from **"Total Operating Revenue"** or **"Total Revenue"**. DO NOT take values from **External Revenue** or **External Customers**.
+        *   Calculate the percentage if the revenue has value.
+        *   If revenues are found first before segmental information, just discard them and use revenues under Segmental Information subsection.
+        *   **All revenue figures are in RM'000 (Ringgit Malaysia thousands).** When extracting numerical values, ensure that you are reporting the values in thousands of Ringgit Malaysia. If a number appears without the "RM'000" indicator, assume that it is already in thousands of Ringgit Malaysia.
+
+        2a. **Geographical Segments/Geographical Information**: (name, total revenue and percentage).
+            *   Ignore if stated with "-".
+
+        2b. **Business Segments/Business Information**: (name, total revenue and percentage).
+            *   Read "-" as 0 (zero).
+
+    3.  **Major Customers**: (name, total revenue, year and percentage). "-" in the table means no revenue available for that year. Count as null. If the revenue for the current year is not available or not present in the table, also count as null. You must calculate the percentage if the revenue has value.
+
+    4.  **Corporate Structure**:
+            -   **Subsidiaries (own >= 50%)**: Extract name, principal activities, and ownership percentage from 1 to 100.
+            -   **Associates (own < 50%)**: Extract name, principal activities, and ownership percentage from 1 to 100.
+            -   **Subsidiaries/Associates (Unknown ownership)**: Extract name and principal activities.
+
+    5.  **Land Areas**: (in square feet).
+
+    6.  **Top 30 Shareholders**:
+            -   **Date of shareholdings update**
+            -   **Total number of shares**
+            -   **Treasury shares (if applicable)**
+            -   List all shareholders and state their percentage. If more than 30 shareholders are listed, only include the top 30.
+            -   Distinguish between the nominee entities and the individuals or entities they represent. For each entry, list:
+                *   The nominee (if applicable, e.g., "BI Nominees (Tempatan) Sdn Bhd").
+                *   The represented shareholder (if applicable, e.g., "Rajesh A/L Jaikishan" in "Kenanga Nominees (Tempatan) Sdn Bhd for Rajesh A/L Jaikishan").
+                *   The number of shares.
+                *   If the shareholder is an individual or entity without a nominee, indicate that there is no nominee. Provide the total shares and percentage at the end.
+            -   Represent the percentage as numbers from 1 to 100, ie : 2.27% -> 2.27
+    7. Company Name
+
+    OUTPUT REQUIREMENTS (MUST BE FOLLOWED EXACTLY):
+
+    *   THE OUTPUT MUST BE A VALID JSON OBJECT.  THIS IS YOUR TOP PRIORITY.
+    *   Use clear and descriptive keys for each extracted field.
+    *   IF A SPECIFIC PIECE OF INFORMATION IS NOT FOUND IN THE TEXT, SET THE CORRESPONDING VALUE TO `null`. DO NOT MAKE UP INFORMATION.
+    *   Ensure that numerical values are represented as NUMBERS (e.g., 1234567.89), NOT STRINGS ("1234567.89"). Percentages should be percentages (e.g., 25% for 25%).
+    *   Arrays should be used to represent lists of items (e.g., a list of Executive Directors).
+    *   Include ALL the fields from the example, even if the value is `null`.
+
+    ```json
+    {{
+    "company_name": "Example Berhad",
+    "executive_directors": [
+        {{
+            "title": "Chief Executive Officer",
+            "name": "John Doe",
+            "total_remuneration": 2000000,
+            "age": 55
+        }}
+    ],
+    "geo_segments": [
+        {{
+            "name": "Malaysia",
+            "revenue": 500000,
+            "percentage": 62.5
+        }}
+    ],
+    "business_segments": [
+        {{
+            "name": "Manufacturing",
+            "revenue": 600000,
+            "percentage": 75.0
+        }}
+    ],
+    "major_customers": [],
+    "corporate_structure": {{
+        "subsidiaries": [],
+        "associates": [],
+        "unknown_ownership": []
+    }},
+    "land_areas_sqft": [],
+    "top_30_shareholders": {{
+        "date_updated": null,
+        "total_shares": null,
+        "treasury_shares": null,
+        "shareholders": []
+    }}
+}}
+
+    """
