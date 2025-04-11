@@ -53,7 +53,7 @@ def analyze_text_with_gemini(url_path):
         2b. **Business Segments/Business Information**: (name, total revenue and percentage).
             *   Read "-" as 0 (zero).
         
-    3.  **Major Customers**: (name, total revenue, year and percentage). "-" in the table means no revenue available for that year. Count as null. If the revenue for the current year is not available or not present in the table, also count as null. Calculate the percentage if the revenue has value.
+    3.  **Major Customers**: (name, total revenue, year and percentage). "-" in the table means no revenue available for that year. Count as null. If the revenue for the current year is not available or not present in the table, also count as null. You must calculate the percentage if the revenue has value.
 
     4.  **Corporate Structure**:
             -   **Subsidiaries (own >= 50%)**: Extract name, principal activities, and ownership percentage from 1 to 100.
@@ -80,9 +80,50 @@ def analyze_text_with_gemini(url_path):
     *   THE OUTPUT MUST BE A VALID JSON OBJECT.  THIS IS YOUR TOP PRIORITY.
     *   Use clear and descriptive keys for each extracted field.
     *   IF A SPECIFIC PIECE OF INFORMATION IS NOT FOUND IN THE TEXT, SET THE CORRESPONDING VALUE TO `null`. DO NOT MAKE UP INFORMATION.
-    *   Ensure that numerical values are represented as NUMBERS (e.g., 1234567.89), NOT STRINGS ("1234567.89"). Percentages should be decimals (e.g., 0.25 for 25%).
+    *   Ensure that numerical values are represented as NUMBERS (e.g., 1234567.89), NOT STRINGS ("1234567.89"). Percentages should be percentages (e.g., 25% for 25%).
     *   Arrays should be used to represent lists of items (e.g., a list of Executive Directors).
     *   Include ALL the fields from the example, even if the value is `null`.
+    
+    ```json
+    {{
+    "company_name": "Example Berhad",
+    "executive_directors": [
+        {{
+            "title": "Chief Executive Officer",
+            "name": "John Doe",
+            "total_remuneration": 2000000,
+            "age": 55
+        }}
+    ],
+    "geo_segments": [
+        {{
+            "name": "Malaysia",
+            "revenue": 500000,
+            "percentage": 62.5
+        }}
+    ],
+    "business_segments": [
+        {{
+            "name": "Manufacturing",
+            "revenue": 600000,
+            "percentage": 75.0
+        }}
+    ],
+    "major_customers": [],
+    "corporate_structure": {{
+        "subsidiaries": [],
+        "associates": [],
+        "unknown_ownership": []
+    }},
+    "land_areas_sqft": [],
+    "top_30_shareholders": {{
+        "date_updated": null,
+        "total_shares": null,
+        "treasury_shares": null,
+        "shareholders": []
+    }}
+}}
+    
     """
 
     try:
@@ -144,22 +185,22 @@ def from_db_link(url_path):
         print(f"ERROR: Error writing to file: {e}")
 
 
-# if __name__ == "__main__":
-#     # Specify the PDF path here:
-#     url_path = "https://anns.sgp1.cdn.digitaloceanspaces.com/3538766.pdf" # Replace with the actual path to your PDF file , en
+if __name__ == "__main__":
+    # Specify the PDF path here:
+    url_path = "https://anns.sgp1.cdn.digitaloceanspaces.com/3443412.pdf" # Replace with the actual path to your PDF file , en
 
-#     print(f"Processing PDF: {url_path}")
+    print(f"Processing PDF: {url_path}")
 
 
-#     structured_data = analyze_text_with_gemini(url_path)
+    structured_data = analyze_text_with_gemini(url_path)
 
-#     # Change output file name to match the PDF file name
-#     pdf_file_name = os.path.splitext(os.path.basename(url_path))[0]  # Get PDF file name without extension
-#     output_file = f"{pdf_file_name}_extracted.json"
+    # Change output file name to match the PDF file name
+    pdf_file_name = os.path.splitext(os.path.basename(url_path))[0]  # Get PDF file name without extension
+    output_file = f"{pdf_file_name}_extracted.json"
 
-#     try:
-#         with open(output_file, "w", encoding="utf-8") as f:
-#             json.dump(structured_data, f, indent=4, ensure_ascii=False)  # Ensure UTF-8 encoding
-#         print(f"Extraction complete! Data saved to {output_file}")
-#     except Exception as e:
-#         print(f"ERROR: Error writing to file: {e}")
+    try:
+        with open(output_file, "w", encoding="utf-8") as f:
+            json.dump(structured_data, f, indent=4, ensure_ascii=False)  # Ensure UTF-8 encoding
+        print(f"Extraction complete! Data saved to {output_file}")
+    except Exception as e:
+        print(f"ERROR: Error writing to file: {e}")
