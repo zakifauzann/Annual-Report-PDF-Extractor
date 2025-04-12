@@ -1,4 +1,3 @@
-prompt = f"""
     You are an expert in financial analysis and annual reports with accuracy and no mistakes. Your ABSOLUTE TOP PRIORITY is to extract specific information from the provided text and output the response in a STRICTLY VALID JSON format. If information is not found, leave the corresponding field empty or null.
 
     EXTRACT THE FOLLOWING INFORMATION:
@@ -95,5 +94,3 @@ prompt = f"""
         "shareholders": []
     }}
 }}
-
-    """
